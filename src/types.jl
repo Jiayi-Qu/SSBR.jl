@@ -9,57 +9,57 @@ type Numbers
 end
 
 type ZMats
-  Z::SparseMatrixCSC{Float64,Int64}    # Z= | Zn 0 |=|Z_n Z_g|
-  Zn::SparseMatrixCSC{Float64,Int64}   #    | 0  Zg|
-  Zg::SparseMatrixCSC{Float64,Int64}   #
-  Z_n::SparseMatrixCSC{Float64,Int64}  # Z_n=|Zn|
-  Z_g::SparseMatrixCSC{Float64,Int64}  #     |0 |
+  full::SparseMatrixCSC{Float64,Int64}   #Z   # Z= | Zn 0 |=|Z_n Z_g|
+  n::SparseMatrixCSC{Float64,Int64}      #Zn  #    | 0  Zg|
+  g::SparseMatrixCSC{Float64,Int64}      #Zg  #
+  _n::SparseMatrixCSC{Float64,Int64}     #Z_n # Z_n=|Zn|
+  _g::SparseMatrixCSC{Float64,Int64}     #Z_g #     |0 |
 end
 
-type AMats
-  Ai::SparseMatrixCSC{Float64,Int64}
-  Ai_nn::SparseMatrixCSC{Float64,Int64} #Ai11
-  Ai_ng::SparseMatrixCSC{Float64,Int64} #Ai12
+type AiMats
+  full::SparseMatrixCSC{Float64,Int64}    #Ai
+  nn::SparseMatrixCSC{Float64,Int64} #Ai_nn
+  ng::SparseMatrixCSC{Float64,Int64} #Ai_ng
 end
 
 type YVecs
-  y::Array{Float64,1}
-  yn::Array{Float64,1} #y1
-  yg::Array{Float64,1} #y2  #order of ids is same to order of y
+  full::Array{Float64,1}   #y
+  n::Array{Float64,1}      #yn
+  g::Array{Float64,1}      #yg  #order of ids is same to order of y
   ids::Array{ASCIIString,1} #order of ids is nongeno then geno
 end
 
 type MMats
-  M::Array{Float64,2}
-  Mn::Array{Float64,2} #M1
-  Mg::Array{Float64,2} #M2
+  full::Array{Float64,2}
+  n::Array{Float64,2} #Mn
+  g::Array{Float64,2} #Mg
 end
 
 type JVecs
-  J::Array{Float64,2}
-  Jn::Array{Float64,2}
-  Jg::Array{Float64,2}
+  full::Array{Float64,2}
+  n::Array{Float64,2} #Jn
+  g::Array{Float64,2} #Jg
 end
 
 type XMats #sparse may be better
-  X::Array{Float64,2}
-  Xn::Array{Float64,2}
-  Xg::Array{Float64,2}
+  full::Array{Float64,2}
+  n::Array{Float64,2} #Xn
+  g::Array{Float64,2} #Xg
 end
 
 type WMats
-  W::Array{Float64,2}
-  Wn::Array{Float64,2}
-  Wg::Array{Float64,2}
+  full::Array{Float64,2}
+  n::Array{Float64,2} #Wn
+  g::Array{Float64,2} #Wg
 end
 
 type HybridMatrices
-  zmats::ZMats
-  amats::AMats
-  yvecs::YVecs
-  jvecs::JVecs
-  xmats::XMats
-  wmats::WMats
-  mmats::MMats
+  Z::ZMats
+  Ai::AMats
+  y::YVecs
+  J::JVecs
+  X::XMats
+  W::WMats
+  M::MMats
   num::Numbers
 end

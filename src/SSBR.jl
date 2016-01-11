@@ -5,8 +5,8 @@ using PedModule
 using DataFrames
 
 include("types.jl")
-include("functions.jl")
-#include("ssGibbs.jl")
+include("getMatrices.jl")
+include("ssGibbs.jl")
 #include("ssMME.jl")
 
 export calc_Ai
