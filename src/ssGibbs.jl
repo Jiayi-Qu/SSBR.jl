@@ -1,4 +1,4 @@
-function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::InputParameters;outFreq=5000)
+function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::QTL.InputParameters;outFreq=5000)
 
     y   = matrices.y.full
     X   = matrices.X.full
@@ -6,8 +6,9 @@ function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::Input
     Z11 = matrices.Z.n
     Ai11= matrices.Ai.nn
 
-    sum2pq    = (2*geno.alleleFreq*(1-geno.alleleFreq)')[1,1]
-    varEffects = vG/((1-inputParameters.probFixed)*sum2pq)
+    sum2pq    = geno.sum2pq
+    varEffects = inputParameters.varGenotypic/((1-inputParameters.probFixed)*sum2pq)
+
 
     mu   = mean(y)
     yCorr= y - mu
@@ -15,8 +16,10 @@ function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::Input
     α    = zeros(Float64,matrices.num.markers)
     ϵ    = zeros(Float64,matrices.num.pedn)
 
+
+
     meanBeta  = [0.0, 0.0]
-    meanAlpha = zeros(Float64,matrices.num.markers)
+    meanAlpha = zeros(Float64,matrices.num.mbarkers)
     meanEpsi  = zeros(Float64,matrices.num.pedn)
 
     wGibbs = GibbsMats(W)
@@ -33,11 +36,20 @@ function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::Input
     sd_epsilon      = sqrt(lhsDi_epsilon*vRes)
 
     if inputParameters.estimateVariance==false
-      λ        = vRes/vAlpha
-      lhsDi    = [1.0/(wpw[i]+λ)::Float64 for i=1:size(wpw,1)]
-      sd       = sqrt(lhsDi*vRes)
+      #construct lhs for sampleEpsilon!
+      λ_epsilon       = vRes/vG
+      Z_1             = all_Z.Z_1
+      lhs_epsilon     = Z_1'Z_1+Ai11*λ_epsilon
+      lhsCol_epsilon  = [lhs_epsilon[:,i] for i=1:size(lhs_epsilon,1)]
+      lhsDi_epsilon   = 1.0./diag(lhs_epsilon)
+      sd_epsilon      = sqrt(lhsDi_epsilon*vRes)
+
+      λ               = vRes/vAlpha
+      lhsDi           = [1.0/(wpw[i]+λ)::Float64 for i=1:size(wpw,1)]
+      sd              = sqrt(lhsDi*vRes)
     end
 
+    println("running ",input.method," with a MCMC of length ",input.chainlength)
 
     for iter = 1:nIter
 
@@ -63,7 +75,7 @@ function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::Input
     return aHat,meanAlpha,meanBeta,meanEpsi
 end
 
-function sampleEpsi!(mats::HybridMatrices,current::Current,out::Out)
+function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
     yCorr         = current.yCorr
     varRes        = current.varResidual
     λ             = current.varResidual/current.varEffects
@@ -84,7 +96,7 @@ function sampleEpsi!(mats::HybridMatrices,current::Current,out::Out)
     yCorr[:] = yCorr[:] - Z_n*ϵ
 end
 
-function sampleEpsi!(mats::HybridMatrices,current::Current,out::Out)
+function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
     yCorr         = current.yCorr
     varRes        = current.varResidual
     λ             = current.varResidual/current.varEffects
@@ -105,14 +117,14 @@ function sampleEpsi!(mats::HybridMatrices,current::Current,out::Out)
     yCorr[:] = yCorr[:] - Z_n*ϵ
 end
 
-function sampleEpsi!(mats::HybridMatrices,current::Current,out::Out,,lhsDi,sd)
+function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output,lhsDi,sd)
     Z_n  = mats.Z._n
     yCorr= current.yCorr
 
     yCorr[:] = yCorr[:] + Z_n*ϵ
     rhs = Z_n'yCorr
 
-    sample_effects_rhs!(lhsCol,rhs,lhsDi,sd,ϵ,meanEpsi,iIter)
+    sample_random_rhs!(lhsCol,rhs,lhsDi,sd,ϵ,meanEpsi,iIter)
 
     yCorr[:] = yCorr[:] - Z_1*ϵ
 end

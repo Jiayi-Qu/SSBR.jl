@@ -1,6 +1,6 @@
 function make_matrices_hybrid(pedfile,genofile,phenofile)
   num=SSBR.Numbers(0,0,0,0,0,0,0)
-  geno =make_genotypes(genofile,id4row=true);
+  geno =make_genotypes(genofile);
   ped,amats =calc_Ai(pedfile,geno,num);
   mmats = make_MMats(geno,num,amats,ped);
   yvecs = make_yVecs(phenofile,ped,num);
@@ -20,10 +20,10 @@ function calc_Ai(pedfile,geno::Genotypes,num::Numbers;calculateInbreeding=true)
     num.pedg    = num.ped-num.pedn
     Ai_nn       = Ai[1:num.pedn,1:num.pedn]
     Ai_ng       = Ai[1:num.pedn,(num.pedn+1):num.ped]
-    return ped,AMats(Ai,Ai_nn,Ai_ng)
+    return ped,AiMats(Ai,Ai_nn,Ai_ng)
 end
 
-function make_MMats(geno::Genotypes,num::Numbers,a_mats::AMats,ped::PedModule.Pedigree)
+function make_MMats(geno::Genotypes,num::Numbers,a_mats::AiMats,ped::PedModule.Pedigree)
     Mg = Array(Float64,geno.nObs,geno.nMarkers)
     num.markers  = geno.nMarkers
     #reorder genotypes to get Mg with same order as Ai_gg
@@ -32,7 +32,7 @@ function make_MMats(geno::Genotypes,num::Numbers,a_mats::AMats,ped::PedModule.Pe
       row = ped.idMap[id].seqID - num.pedn
       Mg[row,:] = geno.genotypes[i,:]
     end
-    Mn = a_mats.Ai_nn\(-a_mats.Ai_ng*Mg)
+    Mn = a_mats.nn\(-a_mats.ng*Mg)
     M  = [Mn;Mg];
     return MMats(M,Mn,Mg)
 end
@@ -62,9 +62,9 @@ function make_yVecs(file,ped::PedModule.Pedigree,num::Numbers;header=false)
     return YVecs(y,yn,yg,ids)
 end
 
-function make_JVecs(num::Numbers,a_mats::AMats)
+function make_JVecs(num::Numbers,a_mats::AiMats)
     Jg = -ones(num.pedg,1)
-    Jn = a_mats.Ai_nn\(-a_mats.Ai_ng*Jg)
+    Jn = a_mats.nn\(-a_mats.ng*Jg)
     J  = [Jn;
           Jg]
     return JVecs(J,Jn,Jg)
@@ -87,13 +87,13 @@ function make_ZMats(ped,yvecs::YVecs,num::Numbers)
 end
 
 function make_XWMats(jvecs,zmats,mmats,num::Numbers)#now fixed effects: μ
-    Xn  = hcat(ones(num.yn), zmats.Zn*jvecs.Jn)
-    Xg  = hcat(ones(num.yg), zmats.Zg*jvecs.Jg)
+    Xn  = hcat(ones(num.yn), zmats.n*jvecs.n)
+    Xg  = hcat(ones(num.yg), zmats.g*jvecs.g)
     X   =[Xn;
           Xg]
 
-    Wn = zmats.Zn*mmats.Mn
-    Wg = zmats.Zg*mmats.Mg
+    Wn = zmats.n*mmats.n
+    Wg = zmats.g*mmats.g
     W  = [Wn;Wg];
     return XMats(X,Xn,Xg),WMats(W,Wn,Wg)
 end

@@ -55,7 +55,7 @@ end
 
 type HybridMatrices
   Z::ZMats
-  Ai::AMats
+  Ai::AiMats
   y::YVecs
   J::JVecs
   X::XMats
@@ -63,3 +63,6 @@ type HybridMatrices
   M::MMats
   num::Numbers
 end
+
+
+
