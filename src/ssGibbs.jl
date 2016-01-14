@@ -1,4 +1,5 @@
-function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::QTL.InputParameters;outFreq=5000)
+function ssGibbs(matrices::HybridMatrices,geno::Genotypes,fxied::FixedMatrix
+                 inputParameters::QTL.InputParameters;outFreq=5000)
 
     y   = matrices.y.full
     X   = matrices.X.full
@@ -6,21 +7,23 @@ function ssGibbs(matrices::HybridMatrices,geno::Genotypes,inputParameters::QTL.I
     Z11 = matrices.Z.n
     Ai11= matrices.Ai.nn
 
-    sum2pq    = geno.sum2pq
-    varEffects = inputParameters.varGenotypic/((1-inputParameters.probFixed)*sum2pq)
+    current   = Current(inputParameter,geno,fixed,y)
+    current.β = zeros(length(current.β)+1) #add one for μ_g
+    current.ϵ = zeros(matrices.num.pedn)
 
 
-    mu   = mean(y)
-    yCorr= y - mu
-    β    = [mu, 0.0]
-    α    = zeros(Float64,matrices.num.markers)
-    ϵ    = zeros(Float64,matrices.num.pedn)
+    #sum2pq    = geno.sum2pq
+    #varEffects = inputParameters.varGenotypic/((1-inputParameters.probFixed)*sum2pq)
+    #mu   = mean(y)
+    #yCorr= y - mu
+    #β    = zeros()
+    #α    = zeros(Float64,matrices.num.markers)
+    #ϵ    = zeros(Float64,matrices.num.pedn)
 
+    Output                 = Output(inputParameter,geno,fixed)
+    Output.meanFixdEffects = zeros(length(current.meanFixdEffects)+1) #add one for μ_g
+    Output.meanEpsi        = zeros(matrices.num.pedn)
 
-
-    meanBeta  = [0.0, 0.0]
-    meanAlpha = zeros(Float64,matrices.num.mbarkers)
-    meanEpsi  = zeros(Float64,matrices.num.pedn)
 
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
