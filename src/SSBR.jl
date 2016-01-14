@@ -6,6 +6,7 @@ using DataFrames
 
 include("SSBR_types.jl")
 include("getMatrices.jl")
+include("sampleEpsilon.jl")
 include("ssGibbs.jl")
 #include("ssMME.jl")
 

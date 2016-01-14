@@ -7,7 +7,7 @@ function make_matrices_hybrid(pedfile,genofile,phenofile)
   jvecs = make_JVecs(num,amats);
   zmats =make_ZMats(ped,yvecs,num);
   xmats, wmats = make_XWMats(jvecs,zmats,mmats,num)
-  return geno,HybridMatrices(zmats,amats,yvecs,jvecs,
+  return ped,geno,HybridMatrices(zmats,amats,yvecs,jvecs,
                              xmats,wmats,mmats,num)
 end
 

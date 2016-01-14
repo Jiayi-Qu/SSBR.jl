@@ -1,134 +1,70 @@
-function ssGibbs(matrices::HybridMatrices,geno::Genotypes,fxied::FixedMatrix
-                 inputParameters::QTL.InputParameters;outFreq=5000)
+function ssGibbs(matrices::HybridMatrices,
+                 geno::Genotypes,fixed::FixedMatrix,
+                 ped::PedModule.Pedigree,
+                 input::QTL.InputParameters;outFreq=5000)
 
     y   = matrices.y.full
     X   = matrices.X.full
     W   = matrices.W.full
-    Z11 = matrices.Z.n
-    Ai11= matrices.Ai.nn
+    Zn  = matrices.Z.n
+    Ai_nn = matrices.Ai.nn
 
-    current   = Current(inputParameter,geno,fixed,y)
+    current   = Current(input,geno,fixed,y)
     current.β = zeros(length(current.β)+1) #add one for μ_g
     current.ϵ = zeros(matrices.num.pedn)
 
-
-    #sum2pq    = geno.sum2pq
-    #varEffects = inputParameters.varGenotypic/((1-inputParameters.probFixed)*sum2pq)
-    #mu   = mean(y)
-    #yCorr= y - mu
-    #β    = zeros()
-    #α    = zeros(Float64,matrices.num.markers)
-    #ϵ    = zeros(Float64,matrices.num.pedn)
-
-    Output                 = Output(inputParameter,geno,fixed)
-    Output.meanFixdEffects = zeros(length(current.meanFixdEffects)+1) #add one for μ_g
-    Output.meanEpsi        = zeros(matrices.num.pedn)
+    output                 = QTL.Output(input,geno,fixed)
+    output.meanFixdEffects = zeros(length(current.β)+1) #add one for μ_g
+    output.meanEpsi        = zeros(matrices.num.pedn)
 
 
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
 
-    zpz = diag(Z11'Z11)
-
-    #construct lhs for sampleEpsilon!
-    λ_epsilon       = vRes/vG
-    Z_1             = all_Z.Z_1
-    lhs_epsilon     = Z_1'Z_1+Ai11*λ_epsilon
-    lhsCol_epsilon  = [lhs_epsilon[:,i] for i=1:size(lhs_epsilon,1)]
-    lhsDi_epsilon   = 1.0./diag(lhs_epsilon)
-    sd_epsilon      = sqrt(lhsDi_epsilon*vRes)
-
-    if inputParameters.estimateVariance==false
+    if input.estimateVariance==false
       #construct lhs for sampleEpsilon!
-      λ_epsilon       = vRes/vG
-      Z_1             = all_Z.Z_1
-      lhs_epsilon     = Z_1'Z_1+Ai11*λ_epsilon
-      lhsCol_epsilon  = [lhs_epsilon[:,i] for i=1:size(lhs_epsilon,1)]
-      lhsDi_epsilon   = 1.0./diag(lhs_epsilon)
-      sd_epsilon      = sqrt(lhsDi_epsilon*vRes)
-
-      λ               = vRes/vAlpha
-      lhsDi           = [1.0/(wpw[i]+λ)::Float64 for i=1:size(wpw,1)]
-      sd              = sqrt(lhsDi*vRes)
+      λ_ϵ             = input.varResidual/input.varGenotypic
+      Z_n             = matrices.Z._n
+      lhs_ϵ           = Z_n'Z_n+Ai_nn*λ_ϵ
+      lhsCol_ϵ        = [lhs_ϵ[:,i] for i=1:size(lhs_ϵ,1)]
+      lhsDi_ϵ         = 1.0./diag(lhs_ϵ)
+      sd_ϵ            = sqrt(lhsDi_ϵ*current.varResidual)
+      #construct lhs for sample marker effects
+      λ               = current.varResidual/current.varEffect
+      lhsDi           = [1.0/(wGibbs.xpx[i]+λ)::Float64 for i=1:size(wGibbs.xpx,1)]
+      sd              = sqrt(lhsDi*current.varResidual)
     end
 
-    println("running ",input.method," with a MCMC of length ",input.chainlength)
+    println("running ",input.method," with a MCMC of length ",input.chainLength)
 
-    for iter = 1:nIter
+    for iter = 1:input.chainLength
 
-      iIter = 1.0/iter
+      current.iter += 1
       # sample fixed effects
-      sample_fixed!(xGibbs,current,out)
+      sample_fixed!(xGibbs,current,output)
       # sample marker effects
-      sample_random_ycorr!(wGibbs,current,out,lhsDi,sd)
+      sample_random_ycorr!(wGibbs,current,output,lhsDi,sd)
       # sample epsilon
-      sampleEpsi!(all_Z,lhsCol_epsilon,lhsDi_epsilon,sd_epsilon,yCorr,ϵ,meanEpsi,iIter)
+      sampleEpsi!(matrices,current,output,lhsCol_ϵ,lhsDi_ϵ,sd_ϵ)
 
       if (iter%outFreq ==0)
           println("This is iteration ",iter)
       end
     end
 
-    mu_g = meanBeta[2]
+    estimatedMarkerEffects = output.meanMarkerEffects
 
-    alpha_hat = meanAlpha
-    epsi_hat  = meanEpsi
-    aHat = all_J.J*mu_g+all_M.M*alpha_hat
-    aHat[1:all_num.num_g1,:] += epsi_hat
-    return aHat,meanAlpha,meanBeta,meanEpsi
+    mu_g = output.meanFixdEffects[end]
+    EBV = matrices.J.full*mu_g+matrices.M.full*estimatedMarkerEffects
+    EBV[1:matrices.num.pedn,:] += output.meanEpsi
+
+    IDs=PedModule.getIDs(ped);
+    EBV=DataFrame(ID=IDs,EBV=vec(EBV))
+
+    return EBV
 end
 
-function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
-    yCorr         = current.yCorr
-    varRes        = current.varResidual
-    λ             = current.varResidual/current.varEffects
-    iIter         = 1/current.iter
-    Z_n           = mats.Z._n
-    Ai_nn         = mats.Ai.nn
-    meanEpsi      = out.meanEpsi
-    ϵ             = current.ϵ
+export ssGibbs
 
-    #add back {Zn'Zn}_{i,i} *ϵ
-    yCorr[:] = yCorr[:] + Z_n*ϵ
-    rhs = Z_n'yCorr
 
-    lhs = Z_n'Z_n+Ai_nn*λ
-
-    sample_random_rhs!(lhs,rhs,current,out) #use this general function for sample epsilon(Gianola Book)
-
-    yCorr[:] = yCorr[:] - Z_n*ϵ
-end
-
-function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
-    yCorr         = current.yCorr
-    varRes        = current.varResidual
-    λ             = current.varResidual/current.varEffects
-    iIter         = 1/current.iter
-    Z_n           = mats.Z._n
-    Ai_nn         = mats.Ai.nn
-    meanEpsi      = out.meanEpsi
-    ϵ             = current.ϵ
-
-    #add back {Zn'Zn}_{i,i} *ϵ
-    yCorr[:] = yCorr[:] + Z_n*ϵ
-    rhs = Z_n'yCorr
-
-    lhs = Z_n'Z_n+Ai_nn*λ
-
-    sample_random_rhs!(lhs,rhs,current,out) #use this general function for sample epsilon(Gianola Book)
-
-    yCorr[:] = yCorr[:] - Z_n*ϵ
-end
-
-function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output,lhsDi,sd)
-    Z_n  = mats.Z._n
-    yCorr= current.yCorr
-
-    yCorr[:] = yCorr[:] + Z_n*ϵ
-    rhs = Z_n'yCorr
-
-    sample_random_rhs!(lhsCol,rhs,lhsDi,sd,ϵ,meanEpsi,iIter)
-
-    yCorr[:] = yCorr[:] - Z_1*ϵ
-end
 
