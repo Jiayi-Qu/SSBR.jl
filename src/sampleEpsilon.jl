@@ -27,7 +27,7 @@ function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output,l
 
 
     #current.yCorr = current.yCorr + Z_n*ϵ #maybe yCorr[:] = yCorr[:] - Z_1*ϵ better
-    yCorr[:] = yCorr[:] - Z_n*ϵ
+    yCorr[:] = yCorr[:] + Z_n*ϵ
     #rhs = Z_n'current.yCorr
     rhs = Z_n'yCorr
 

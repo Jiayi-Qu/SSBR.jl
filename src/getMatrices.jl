@@ -1,6 +1,6 @@
 function make_matrices_hybrid(pedfile,genofile,phenofile)
   num=SSBR.Numbers(0,0,0,0,0,0,0)
-  geno =make_genotypes(genofile);
+  geno =make_genotypes(genofile,center=false);
   ped,amats =calc_Ai(pedfile,geno,num);
   mmats = make_MMats(geno,num,amats,ped);
   yvecs = make_yVecs(phenofile,ped,num);

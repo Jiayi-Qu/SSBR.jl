@@ -14,13 +14,14 @@ function ssGibbs(matrices::HybridMatrices,
     current.ϵ = zeros(matrices.num.pedn)
 
     output                 = QTL.Output(input,geno,fixed)
-    output.meanFixdEffects = zeros(length(current.β)+1) #add one for μ_g
+    output.meanFixdEffects = zeros(length(output.meanFixdEffects)+1) #add one for μ_g
     output.meanEpsi        = zeros(matrices.num.pedn)
 
 
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
 
+    current.varEffect=input.varGenotypic/geno.nMarkers
     if input.estimateVariance==false
       #construct lhs for sampleEpsilon!
       λ_ϵ             = input.varResidual/input.varGenotypic
@@ -61,7 +62,7 @@ function ssGibbs(matrices::HybridMatrices,
     IDs=PedModule.getIDs(ped);
     EBV=DataFrame(ID=IDs,EBV=vec(EBV))
 
-    return EBV
+    return EBV,output.meanFixdEffects
 end
 
 export ssGibbs
