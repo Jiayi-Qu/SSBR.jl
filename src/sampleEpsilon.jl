@@ -5,8 +5,8 @@ function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
     iIter         = 1/current.iter
     Z_n           = mats.Z._n
     Ai_nn         = mats.Ai.nn
-    meanEpsi      = out.meanEpsi
-    ϵ             = current.ϵ
+    meanEpsi      = out.mean_imputation_residual
+    ϵ             = current.imputation_residual
 
     #add back {Zn'Zn}_{i,i} *ϵ
     current.yCorr = current.yCorr + Z_n*ϵ
@@ -23,7 +23,7 @@ end
 function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output,lhsCol,lhsDi,sd)
     Z_n  = mats.Z._n
     yCorr= current.yCorr
-    ϵ    = current.ϵ
+    ϵ    = current.imputation_residual
 
 
     #maybe current.yCorr = current.yCorr + Z_n*ϵ better
@@ -34,5 +34,5 @@ function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output,l
     sample_random_rhs!(lhsCol,rhs,current,out,lhsDi,sd)
 
     #current.yCorr = current.yCorr - Z_n*ϵ
-    yCorr[:] = yCorr[:] - Z_n*current.ϵ
+    yCorr[:] = yCorr[:] - Z_n*ϵ
 end

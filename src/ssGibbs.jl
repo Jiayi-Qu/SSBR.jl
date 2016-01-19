@@ -10,12 +10,12 @@ function ssGibbs(matrices::HybridMatrices,
     Ai_nn = matrices.Ai.nn
 
     current   = Current(input,geno,fixed,y)
-    current.β = zeros(length(current.β)+1) #add one for μ_g
-    current.ϵ = zeros(matrices.num.pedn)
+    current.fixed_effects = zeros(length(current.fixed_effects)+1) #add one for μ_g
+    current.imputation_residual = zeros(matrices.num.pedn)
 
     output                 = QTL.Output(input,geno,fixed)
-    output.meanFixdEffects = zeros(length(output.meanFixdEffects)+1) #add one for μ_g
-    output.meanEpsi        = zeros(matrices.num.pedn)
+    output.mean_fixed_effects = zeros(length(output.mean_fixed_effects)+1) #add one for μ_g
+    output.mean_imputation_residual        = zeros(matrices.num.pedn)
 
 
     wGibbs = GibbsMats(W)
@@ -55,14 +55,14 @@ function ssGibbs(matrices::HybridMatrices,
 
     estimatedMarkerEffects = output.meanMarkerEffects
 
-    mu_g = output.meanFixdEffects[end]
+    mu_g = output.mean_fixed_effects[end]
     EBV = matrices.J.full*mu_g+matrices.M.full*estimatedMarkerEffects
-    EBV[1:matrices.num.pedn,:] += output.meanEpsi
+    EBV[1:matrices.num.pedn,:] += output.mean_imputation_residual
 
     IDs=PedModule.getIDs(ped);
     EBV=DataFrame(ID=IDs,EBV=vec(EBV))
 
-    return EBV,output.meanFixdEffects
+    return EBV
 end
 
 export ssGibbs
