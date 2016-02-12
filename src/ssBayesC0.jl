@@ -38,7 +38,7 @@ function ssBayesC0(matrices::HybridMatrices,
       # sample epsilon
       sampleEpsi!(matrices,current,output)
       # sample residual vairance
-      current.varResidual=sample_variance(current.yCorr, geno.nObs, input.nuRes, current.scaleRes)
+      current.varResidual=sample_variance(current.yCorr, matrices.num.y, input.nuRes, current.scaleRes)
       # sample marker vairance
       current.varEffect = sample_variance(current.α, geno.nMarkers, input.dfEffectVar, current.scaleVar)
       # sample marker vairance
