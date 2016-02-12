@@ -1,47 +1,46 @@
 # SSBR
 
-[![Build Status](https://travis-ci.org/reworkhow/SSBR.jl.svg?branch=master)](https://travis-ci.org/reworkhow/SSBR.jl)
-
 SSBR is a tool for single step Bayesian regression analyses.
 
 
 ####Quick-start
 
 ```Julia
+using DataFrames
+using QTL
 using SSBR
 
-ped,A_Mats,numSSBayes = calc_Ai("example/ped.txt","example/genotype.ID")
-df    = read_genotypes("example/genotype.txt",numSSBayes)
-M_Mats = make_MMats(df,A_Mats,ped)
-y_Vecs = make_yVecs("example/phenotype.txt",ped,numSSBayes)
-J_Vecs = make_JVecs(numSSBayes,A_Mats)
-Z_Mats = make_ZMats(ped,y_Vecs,numSSBayes)
-X_Mats, W_Mats = make_XWMats(J_Vecs,Z_Mats,M_Mats,numSSBayes)
+PhenoFile  ="training.txt"
+GenoFile   ="snp.txt"
+PedFile    ="ped.txt"
+Validation ="validation.txt"
+fixed=FixedMatrix(ones(90,1),[0]) #change to read txt file later
 
-#Gibbs sampler
-nIter  = 50000
-vRes   = 1.0
-vG     = 1.0
-aHat,alphaHat,betaHat,epsiHat=ssGibbs(M_Mats,y_Vecs,J_Vecs,Z_Mats,X_Mats,W_Mats,A_Mats,numSSBayes,vRes,vG,nIter);
+input=InputParameters()
+input.varGenotypic = 4.48
+input.varResidual  = 6.72
+input.probFixed    = 0.0
+input.chainLength  =50000
 
-#Mixed Model Equation
-vRes   = 1.0
-vG     = 1.0
-aHat2,alphaHat2,betaHat2,epsiHat2=ssMME(M_Mats,y_Vecs,J_Vecs,Z_Mats,X_Mats,W_Mats,A_Mats,numSSBayes,vRes,vG);
+ped,geno,hmats =SSBR.make_matrices_hybrid(PedFile,GenoFile,PhenoFile)
 
-#check accuracy
-df = readtable("example/bv.txt", eltypes =[UTF8String, Float64], separator = ' ',header=false)
-a  = Array(Float64,numSSBayes.num_ped)
-for (i,ID) in enumerate(df[:,1])
-     j = ped.idMap[ID].seqID
-     a[j] = df[i,2]
-end
-cor(a,aHat)
+hmats.M.g=zeros(1,1) #move inside later
+hmats.M.n=zeros(1,1)
+gc()
 
+###BayesC0
+out =SSBR.ssBayesC0(hmats,geno,fixed,ped,input,outFreq=5000);
+#out =SSBR.ssBayesC_constantvariance(hmats,geno,fixed,ped,input,outFreq=100)
+
+###check accuracy
+df = readtable(Validation, eltypes =[UTF8String, Float64], separator = ' ',header=false,names=[:ID,:EBV]);
+comp=join(out,df,on=:ID);
+cor(comp[:EBV],comp[:EBV_1])
 ```
 
 ####More
 
 * **homepage**: [QTL.rocks](http://QTL.rocks)
 * **Installation**: at the Julia REPL, `Pkg.clone("https://github.com/QTL-rocks/SSBR.jl.git")`
+* **Documentation**: [available here](https://github.com/QTL-rocks/SSBR.jl/wiki)
 * **Authors**: [Hao Cheng](http://reworkhow.github.io),[Rohan Fernando](http://www.ans.iastate.edu/faculty/index.php?id=rohan)
