@@ -30,7 +30,7 @@ gc()
 
 ###BayesC0
 out =SSBR.ssBayesC0(hmats,geno,fixed,ped,input,outFreq=5000);
-#out =SSBR.ssBayesC_constantvariance(hmats,geno,fixed,ped,input,outFreq=100)
+#out =SSBR.ssBayesC0_constantvariance(hmats,geno,fixed,ped,input,outFreq=100)
 
 ###check accuracy
 df = readtable(Validation, eltypes =[UTF8String, Float64], separator = ' ',header=false,names=[:ID,:EBV]);
