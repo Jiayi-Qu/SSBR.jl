@@ -12,6 +12,9 @@ function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
     current.yCorr = current.yCorr + Z_n*ϵ
     rhs = Z_n'current.yCorr
 
+    #println("varGenotypic is ",current.varGenotypic)
+    #println("varRes is ",current.varResidual)
+
     lhs = Z_n'Z_n+Ai_nn*λ #better to construct Z_n'Z_n outside
 
     sample_random_rhs!(lhs,rhs,current,out) #use this general function for sample epsilon(Gianola Book)

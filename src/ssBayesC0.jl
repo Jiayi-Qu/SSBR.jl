@@ -22,6 +22,10 @@ function ssBayesC0(matrices::HybridMatrices,
 
     current.varEffect=input.varGenotypic/geno.sum2pq
 
+    meanVare  = 0.0
+    meanVara  = 0.0
+    meanVarg  = 0.0
+
     println("running ",input.method," with a MCMC of length ",input.chainLength)
 
     for iter = 1:input.chainLength
@@ -41,12 +45,17 @@ function ssBayesC0(matrices::HybridMatrices,
       current.varGenotypic = sample_epsilon_variance(current.imputation_residual,
                                                      Ai_nn,
                                                      matrices.num.pedn,
-                                                     input.dfEffectVar,
-                                                     current.scaleVar)
+                                                     input.nuGen,
+                                                     current.scaleGen)
+     #print out values to check convergence
+     meanVare += (current.varResidual - meanVare)/current.iter
+     meanVara += (current.varEffect - meanVara)/current.iter
+     meanVarg += (current.varGenotypic - meanVarg)/current.iter
 
       if (iter%outFreq ==0)
-          println("This is iteration ",iter," with residual variance ",
-                  current.varResidual," and marker variance ", current.varEffect)
+          println("This is iteration ",iter," with mean residual variance ",
+                  meanVare," and mean marker variance ", meanVara,
+                  " and mean genetic variance ", meanVarg)
       end
     end
 
