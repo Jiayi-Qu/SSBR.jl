@@ -7,7 +7,9 @@ using DataFrames
 include("SSBR_types.jl")
 include("getMatrices.jl")
 include("sampleEpsilon.jl")
-include("ssGibbs.jl")
+include("ssBayesC.jl")
+include("ssBayesC0.jl")
+include("ssBayesC0_constantvariance.jl")#for test
 #include("ssMME.jl")
 
 export calc_Ai

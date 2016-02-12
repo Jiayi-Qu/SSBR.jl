@@ -11,8 +11,7 @@ function make_matrices_hybrid(pedfile,genofile,phenofile)
                              xmats,wmats,mmats,num)
 end
 
-function calc_Ai(pedfile,geno::Genotypes,num::Numbers;calculateInbreeding=true)
-    #ped        = PedModule.mkPed(pedfile,inbreeding=calculateInbreeding)
+function calc_Ai(pedfile,geno::Genotypes,num::Numbers)
     ped         = PedModule.mkPed(pedfile)
     num.pedn    = PedModule.genoSet!(geno.obsID,ped)
     Ai          = PedModule.AInverse(ped)

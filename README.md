@@ -43,5 +43,5 @@ cor(a,aHat)
 ####More
 
 * **homepage**: [QTL.rocks](http://QTL.rocks)
-* **Installation**: at the Julia REPL, `Pkg.clone("https://github.com/reworkhow/SSBR.jl.git")`
+* **Installation**: at the Julia REPL, `Pkg.clone("https://github.com/QTL-rocks/SSBR.jl.git")`
 * **Authors**: [Hao Cheng](http://reworkhow.github.io),[Rohan Fernando](http://www.ans.iastate.edu/faculty/index.php?id=rohan)

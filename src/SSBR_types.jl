@@ -1,7 +1,7 @@
 type Numbers
   ped::Int64      #individulals in pedigree
-  pedn::Int64 #g1        #non-genotyped individuals in pedigree
-  pedg::Int64 #g2        #genotyped individuals in pedigree
+  pedn::Int64     #non-genotyped individuals in pedigree
+  pedg::Int64     #genotyped individuals in pedigree
   y::Int64        #individuals with phenotypes
   yn::Int64       #non-genotyped individuals with phenotypes
   yg::Int64       #genotyped individuals with phenotypes

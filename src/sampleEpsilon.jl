@@ -1,7 +1,7 @@
 function sampleEpsi!(mats::HybridMatrices,current::QTL.Current,out::QTL.Output)
     yCorr         = current.yCorr
     varRes        = current.varResidual
-    λ             = current.varResidual/current.varEffects
+    λ             = current.varResidual/current.varGenotypic
     iIter         = 1/current.iter
     Z_n           = mats.Z._n
     Ai_nn         = mats.Ai.nn

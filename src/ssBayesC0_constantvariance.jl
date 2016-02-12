@@ -1,4 +1,4 @@
-function ssGibbs(matrices::HybridMatrices,
+function ssBayesC0_constantvariance(matrices::HybridMatrices,
                  geno::Genotypes,fixed::FixedMatrix,
                  ped::PedModule.Pedigree,
                  input::QTL.InputParameters;outFreq=5000)
@@ -17,12 +17,10 @@ function ssGibbs(matrices::HybridMatrices,
     output.mean_fixed_effects = zeros(length(output.mean_fixed_effects)+1) #add one for μ_g
     output.mean_imputation_residual        = zeros(matrices.num.pedn)
 
-
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
 
-    current.varEffect=input.varGenotypic/geno.nMarkers
-    if input.estimateVariance==false
+    #if input.estimateVariance == false
       #construct lhs for sampleEpsilon!
       λ_ϵ             = input.varResidual/input.varGenotypic
       Z_n             = matrices.Z._n
@@ -34,7 +32,7 @@ function ssGibbs(matrices::HybridMatrices,
       λ               = current.varResidual/current.varEffect
       lhsDi           = [1.0/(wGibbs.xpx[i]+λ)::Float64 for i=1:size(wGibbs.xpx,1)]
       sd              = sqrt(lhsDi*current.varResidual)
-    end
+    #end
 
     println("running ",input.method," with a MCMC of length ",input.chainLength)
 
