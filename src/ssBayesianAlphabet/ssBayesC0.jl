@@ -1,4 +1,4 @@
-function ssBayesC(matrices::HybridMatrices,
+function ssBayesC0(matrices::HybridMatrices,
                  geno::Genotypes,fixed::FixedMatrix,
                  ped::PedModule.Pedigree,
                  input::QTL.InputParameters;outFreq=5000)
@@ -20,8 +20,6 @@ function ssBayesC(matrices::HybridMatrices,
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
 
-    current.varEffect=input.varGenotypic/geno.sum2pq
-
     meanVare  = 0.0
     meanVara  = 0.0
     meanVarg  = 0.0
@@ -38,27 +36,23 @@ function ssBayesC(matrices::HybridMatrices,
       # sample epsilon
       sampleEpsi!(matrices,current,output)
       # sample residual vairance
-      current.varResidual=sample_variance(current.yCorr, geno.nObs, input.nuRes, current.scaleRes)
+      current.varResidual=sample_variance(current.yCorr, matrices.num.y, input.nuRes, current.scaleRes)
       # sample marker vairance
       current.varEffect = sample_variance(current.α, geno.nMarkers, input.dfEffectVar, current.scaleVar)
       # sample marker vairance
       current.varGenotypic = sample_epsilon_variance(current.imputation_residual,
                                                      Ai_nn,
                                                      matrices.num.pedn,
-                                                     input.dfEffectVar,
-                                                     current.scaleVar)
+                                                     input.nuGen,
+                                                     current.scaleGen)
      #print out values to check convergence
-     meanVare += (current.varResidual - meanVare)*iIter
-     meanVara += (current.varEffect - meanVara)*iIter
-     meanVarg += (current.varGenotypic - meanVarg)*iIter
-
-
-
-
+     meanVare += (current.varResidual - meanVare)/current.iter
+     meanVara += (current.varEffect - meanVara)/current.iter
+     meanVarg += (current.varGenotypic - meanVarg)/current.iter
 
       if (iter%outFreq ==0)
-          println("This is iteration ",iter," with residual variance ",
-                  current.varResidual," and marker variance ", current.varEffect)
+       @printf("Iteration %d with mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
+               iter, meanVara, meanVare, meanVarg)
       end
     end
 

@@ -1,4 +1,4 @@
-function ssBayesC0(matrices::HybridMatrices,
+function ssBayesC(matrices::HybridMatrices,
                  geno::Genotypes,fixed::FixedMatrix,
                  ped::PedModule.Pedigree,
                  input::QTL.InputParameters;outFreq=5000)
@@ -20,8 +20,6 @@ function ssBayesC0(matrices::HybridMatrices,
     wGibbs = GibbsMats(W)
     xGibbs = GibbsMats(X)
 
-    current.varEffect=input.varGenotypic/geno.sum2pq
-
     meanVare  = 0.0
     meanVara  = 0.0
     meanVarg  = 0.0
@@ -34,13 +32,13 @@ function ssBayesC0(matrices::HybridMatrices,
       # sample fixed effects
       sample_fixed!(xGibbs,current,output)
       # sample marker effects
-      sample_random_ycorr!(wGibbs,current,output)
+      sampleEffectsBayesC!(wGibbs,current,output)
       # sample epsilon
       sampleEpsi!(matrices,current,output)
       # sample residual vairance
       current.varResidual=sample_variance(current.yCorr, matrices.num.y, input.nuRes, current.scaleRes)
       # sample marker vairance
-      current.varEffect = sample_variance(current.α, geno.nMarkers, input.dfEffectVar, current.scaleVar)
+      current.varEffect = sample_variance(current.α, current.nLoci, input.dfEffectVar, current.scaleVar)
       # sample marker vairance
       current.varGenotypic = sample_epsilon_variance(current.imputation_residual,
                                                      Ai_nn,
@@ -53,9 +51,8 @@ function ssBayesC0(matrices::HybridMatrices,
      meanVarg += (current.varGenotypic - meanVarg)/current.iter
 
       if (iter%outFreq ==0)
-          println("This is iteration ",iter," with mean residual variance ",
-                  meanVare," and mean marker variance ", meanVara,
-                  " and mean genetic variance ", meanVarg)
+       @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
+               iter,current.nLoci, meanVare, meanVara, meanVarg)
       end
     end
 
@@ -70,8 +67,5 @@ function ssBayesC0(matrices::HybridMatrices,
 
     return EBV
 end
-
-export ssGibbs
-
 
 

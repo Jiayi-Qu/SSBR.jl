@@ -6,19 +6,18 @@ using DataFrames
 
 include("SSBR_types.jl")
 include("getMatrices.jl")
-include("sampleEpsilon.jl")
-include("ssBayesC.jl")
-include("ssBayesC0.jl")
-include("ssBayesC0_constantvariance.jl")#for test
+include("imputationResidual/sampleEpsilon.jl")
+include("ssBayesianAlphabet/ssBayesC0.jl")
+include("ssBayesianAlphabet/ssBayesC0_constantvariance.jl")#for test
+include("ssBayesianAlphabet/ssBayesC.jl")
+include("ssBayesianAlphabet/ssBayesB.jl")
+include("run.jl")
+
 #include("ssMME.jl")
 
-export calc_Ai
-export make_MMats
-export make_yVecs
-export make_JVecs
-export make_ZMats
-export make_XWMats
-#export ssGibbs
+export runSSBR
+#export ssBayesC0_constantvariance
+#export ssBayesB,ssBayesC,ssBayesC0
 #export ssMME
 #export PBLUP
 
