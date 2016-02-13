@@ -7,9 +7,10 @@ SSBR is a tool for single step Bayesian regression analyses.
 
 ```Julia
 using QTL
+using QTLDatasets
 using SSBR
 
-#data files form QTLDatasets package
+#data files from QTLDatasets package
 pedfile    = QTLDatasets.dataset("test1","ped.txt")
 genofile   = QTLDatasets.dataset("test1","genotype.txt")
 phenofile  = QTLDatasets.dataset("test1","phenotype.txt")
