@@ -37,6 +37,6 @@ cor(comp[:EBV],comp[:EBV_1])
 ####More
 
 * **homepage**: [QTL.rocks](http://QTL.rocks)
-* **Installation**: at the Julia REPL, `Pkg.clone("https://github.com/QTL-rocks/SSBR.jl.git")`
+* **Installation**: at the Julia REPL, `Pkg.clone("https://github.com/QTL-rocks/SSBR.jl.git")`.  ( install [QTL.jl](https://github.com/QTL-rocks/QTL.jl) at first )
 * **Documentation**: [available here](https://github.com/QTL-rocks/SSBR.jl/wiki)
 * **Authors**: [Hao Cheng](http://reworkhow.github.io),[Rohan Fernando](http://www.ans.iastate.edu/faculty/index.php?id=rohan)
