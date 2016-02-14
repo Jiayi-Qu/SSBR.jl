@@ -52,7 +52,7 @@ function ssBayesC0(matrices::HybridMatrices,
 
       if (iter%outFreq ==0)
        @printf("Iteration %d with mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
-               iter, meanVara, meanVare, meanVarg)
+               iter, meanVare, meanVara, meanVarg)
       end
     end
 
