@@ -7,7 +7,6 @@ function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofi
       hmats.M.g=zeros(1,1) #move inside later
       hmats.M.n=zeros(1,1)
       gc()
-      QTL.center!(hmats.M.full)
 
       fixed=QTL.FixedMatrix(ones(90,1),[0]); #modify later
 
