@@ -22,7 +22,23 @@ input.method       = "BayesC"
 input.varGenotypic = 4.48
 input.varResidual  = 6.72
 input.probFixed    = 0.99
-input.chainLength  = 50000
+
+MCMCinfo(input)
+#MCMC Information:
+#seed                        314
+#chainLength               50000
+#method                   BayesC
+#outFreq                    1000
+#probFixed                 0.990
+#varGenotypic              4.480
+#varResidual               6.720
+#estimateVariance           true
+#estimatePi                false
+#estimateScale             false
+#dfEffectVar               4.000
+#nuRes                     4.000
+#nuGen                     4.000
+
 
 #run it
 out=runSSBR(input,pedigree=pedfile,genotype=genofile,phenotype=phenofile);
