@@ -16,6 +16,8 @@ function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofi
         out=ssBayesC0(hmats,geno,fixed,ped,input,outFreq=input.outFreq)
       elseif input.method=="BayesB"
         out=ssBayesB(hmats,geno,fixed,ped,input,outFreq=input.outFreq)
+      elseif input.method=="BayesC" && input.estimateVariance==false
+        out=ssBayesC_constantvariance(hmats,geno,fixed,ped,input,outFreq=input.outFreq)
       elseif input.method=="BayesC"
         out=ssBayesC(hmats,geno,fixed,ped,input,outFreq=input.outFreq)
       end

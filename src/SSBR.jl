@@ -9,6 +9,7 @@ include("getMatrices.jl")
 include("imputationResidual/sampleEpsilon.jl")
 include("ssBayesianAlphabet/ssBayesC0.jl")
 include("ssBayesianAlphabet/ssBayesC0_constantvariance.jl")#for test
+include("ssBayesianAlphabet/ssBayesC_constantvariance.jl")#for test
 include("ssBayesianAlphabet/ssBayesC.jl")
 include("ssBayesianAlphabet/ssBayesB.jl")
 include("run.jl")
