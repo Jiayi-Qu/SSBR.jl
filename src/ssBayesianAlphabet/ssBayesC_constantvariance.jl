@@ -1,4 +1,4 @@
-function ssBayesC(matrices::HybridMatrices,
+function ssBayesC_constantvariance(matrices::HybridMatrices,
                  geno::Genotypes,fixed::FixedMatrix,
                  ped::PedModule.Pedigree,
                  input::QTL.InputParameters;outFreq=5000)
