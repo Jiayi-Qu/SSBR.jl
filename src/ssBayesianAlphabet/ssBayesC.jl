@@ -45,14 +45,20 @@ function ssBayesC(matrices::HybridMatrices,
                                                      matrices.num.pedn,
                                                      input.nuGen,
                                                      current.scaleGen)
+        if (input.estimatePi == true)
+            current.π = samplePi(current.nLoci, geno.nMarkers)
+        end
+
+
+
      #print out values to check convergence
      meanVare += (current.varResidual - meanVare)/current.iter
      meanVara += (current.varEffect - meanVara)/current.iter
      meanVarg += (current.varGenotypic - meanVarg)/current.iter
 
       if (iter%outFreq ==0)
-       @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
-               iter,current.nLoci, meanVare, meanVara, meanVarg)
+       @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f with π= %6.3f.\n",
+               iter,current.nLoci, meanVare, meanVara, meanVarg, current.π)
       end
     end
 
