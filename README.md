@@ -38,6 +38,7 @@ MCMCinfo(input)
 #dfEffectVar               4.000
 #nuRes                     4.000
 #nuGen                     4.000
+#centering                 false
 
 
 #run it
