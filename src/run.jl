@@ -2,7 +2,7 @@ function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofi
 
       srand(input.seed)
 
-      ped,geno,hmats =make_matrices_hybrid(pedigree,genotype,phenotype);
+      ped,geno,hmats =make_matrices_hybrid(pedigree,genotype,phenotype,center=input.centering);
 
       hmats.M.g=zeros(1,1) #move inside later
       hmats.M.n=zeros(1,1)
