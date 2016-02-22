@@ -96,3 +96,5 @@ function make_XWMats(jvecs,zmats,mmats,num::Numbers)#now fixed effects: μ
     W  = [Wn;Wg];
     return XMats(X,Xn,Xg),WMats(W,Wn,Wg)
 end
+
+export make_matrices_hybrid
