@@ -23,6 +23,7 @@ function ssBayesC(matrices::HybridMatrices,
     meanVare  = 0.0
     meanVara  = 0.0
     meanVarg  = 0.0
+    meanPi    = 0.0
 
     println("running ",input.method," with a MCMC of length ",input.chainLength)
 
@@ -55,10 +56,11 @@ function ssBayesC(matrices::HybridMatrices,
      meanVare += (current.varResidual - meanVare)/current.iter
      meanVara += (current.varEffect - meanVara)/current.iter
      meanVarg += (current.varGenotypic - meanVarg)/current.iter
+     meanPi   += (current.pi - meanPi)/current.iter
 
       if (iter%outFreq ==0)
-       @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f with π= %6.3f.\n",
-               iter,current.nLoci, meanVare, meanVara, meanVarg, current.π)
+       @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f with mean π= %6.3f.\n",
+               iter,current.nLoci, meanVare, meanVara, meanVarg, meanPi)
       end
     end
 
