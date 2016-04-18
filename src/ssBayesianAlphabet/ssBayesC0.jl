@@ -45,13 +45,17 @@ function ssBayesC0(matrices::HybridMatrices,
                                                      matrices.num.pedn,
                                                      input.nuGen,
                                                      current.scaleGen)
-     #print out values to check convergence
-     meanVare += (current.varResidual - meanVare)/current.iter
-     meanVara += (current.varEffect - meanVara)/current.iter
-     meanVarg += (current.varGenotypic - meanVarg)/current.iter
+      #print out values to check convergence
+      meanVare += (current.varResidual - meanVare)/current.iter
+      meanVara += (current.varEffect - meanVara)/current.iter
+      meanVarg += (current.varGenotypic - meanVarg)/current.iter
+
+      #save monte carlo mean for all samples of variance components at each iteration
+      output.resVar[iter] = meanVare
+      output.genVar[iter] = meanVarg
 
       if (iter%outFreq ==0)
-       @printf("Iteration %d with mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
+        @printf("Iteration %d with mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f.\n",
                iter, meanVare, meanVara, meanVarg)
       end
     end

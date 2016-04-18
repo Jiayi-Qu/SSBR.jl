@@ -52,6 +52,9 @@ function ssBayesB(matrices::HybridMatrices,
      meanVare += (current.varResidual - meanVare)/current.iter
      meanVara += (current.varEffect - meanVara)/current.iter
      meanVarg += (current.varGenotypic - meanVarg)/current.iter
+     #save monte carlo mean for all samples of variance components at each iteration
+     output.resVar[iter] = meanVare
+     output.genVar[iter] = meanVarg
 
       if (iter%outFreq ==0)
        @printf("Iteration %d with %d loci included in the model, mean residual/genetic(imputation) variance %6.3f/%6.3f.\n",

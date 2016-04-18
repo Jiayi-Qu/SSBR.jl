@@ -58,6 +58,11 @@ function ssBayesC(matrices::HybridMatrices,
      meanVarg += (current.varGenotypic - meanVarg)/current.iter
      meanPi   += (current.π - meanPi)/current.iter
 
+     #save monte carlo mean for all samples of variance components at each iteration
+     output.resVar[iter] = meanVare
+     output.genVar[iter] = meanVarg
+     output.pi[iter]     = meanPi
+
       if (iter%outFreq ==0)
        @printf("Iteration %d with %d loci included in the model, mean residual/marker effect/genetic(imputation) variance %6.3f/%6.3f/%6.3f with mean π= %6.3f.\n",
                iter,current.nLoci, meanVare, meanVara, meanVarg, meanPi)
