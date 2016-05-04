@@ -42,7 +42,7 @@ MCMCinfo(input)
 
 
 #run it
-out=runSSBR(input,pedigree=pedfile,genotype=genofile,phenotype=phenofile);
+out=runSSBR(input,pedigree=pedfile,genotype=genofile,phenotype=phenofile,fixedfile=fixedfile);
 
 #check accuracy
 using DataFrames
