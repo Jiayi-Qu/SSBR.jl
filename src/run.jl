@@ -10,11 +10,11 @@ function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofi
 
       fixed=QTL.make_fixed(fixedfile,ID_order=hmats.y.ids)
     
-       Xn  = hcat(ones(hmats.num.yn),fixed.C[1:hmats.num.yn,:], hmats.Z.n*hmats.J.n)#intercept, fixed efeectsJ
-       Xg  = hcat(ones(hmats.num.yg),fixed.C[(hmats.num.yn+1):end,:], hmats.Z.g*hmats.J.g)
+       Xn  = hcat(fixed.C[1:hmats.num.yn,:], hmats.Z.n*hmats.J.n)#intercept, fixed efeectsJ
+       Xg  = hcat(fixed.C[(hmats.num.yn+1):end,:], hmats.Z.g*hmats.J.g)
        X   =[Xn;
              Xg]
-    hmats.X = XMats(X,Xn,Xg) #Done, work
+       hmats.X = XMats(X,Xn,Xg) #Done, work
 
     
       if input.method=="BayesC0" && input.estimateVariance==false
