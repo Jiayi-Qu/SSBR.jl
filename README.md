@@ -14,6 +14,7 @@ using SSBR
 pedfile    = QTLDatasets.dataset("test1","ped.txt")
 genofile   = QTLDatasets.dataset("test1","genotype.txt")
 phenofile  = QTLDatasets.dataset("test1","phenotype.txt")
+fixedfile  = QTLDatasets.dataset("test1","fixed.txt")
 Validation = QTLDatasets.dataset("test1","validation.txt")
 
 #set up input parameters
