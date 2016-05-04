@@ -1,4 +1,4 @@
-function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofile")
+function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofile",fixedfile="fixedeffectfile")
 
       srand(input.seed)
 
@@ -8,8 +8,15 @@ function runSSBR(input;pedigree="pedfile",genotype="genofile",phenotype="phenofi
       hmats.M.n=zeros(1,1)
       gc()
 
-      fixed=QTL.FixedMatrix(ones(90,1),[0]); #modify later
+      fixed=QTL.make_fixed(fixedfile,ID_order=hmats.y.ids)
+    
+       Xn  = hcat(fixed.C[1:hmats.num.yn,:], hmats.Z.n*hmats.J.n)
+       Xg  = hcat(fixed.C[(hmats.num.yn+1):end,:], hmats.Z.g*hmats.J.g)
+       X   =[Xn;
+             Xg]
+    hmats.X = XMats(X,Xn,Xg) #Done, work
 
+    
       if input.method=="BayesC0" && input.estimateVariance==false
         out=ssBayesC0_constantvariance(hmats,geno,fixed,ped,input,outFreq=input.outFreq)
       elseif input.method=="BayesC0"
