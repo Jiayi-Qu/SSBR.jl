@@ -6,16 +6,14 @@ SSBR is a tool for single step Bayesian regression analyses.
 ####Quick-start
 
 ```Julia
-using QTL
-using QTLDatasets
-using SSBR
+using JWAS: Datasets,SSBR,misc
 
 #data files from QTLDatasets package
-pedfile    = QTLDatasets.dataset("test1","ped.txt")
-genofile   = QTLDatasets.dataset("test1","genotype.txt")
-phenofile  = QTLDatasets.dataset("test1","phenotype.txt")
-fixedfile  = QTLDatasets.dataset("test1","fixed.txt")
-Validation = QTLDatasets.dataset("test1","validation.txt")
+pedfile    = Datasets.dataset("testSSBR","ped.txt")
+genofile   = Datasets.dataset("testSSBR","genotype.txt")
+phenofile  = Datasets.dataset("testSSBR","phenotype.txt")
+fixedfile  = Datasets.dataset("testSSBR","fixed.txt")
+Validation = Datasets.dataset("testSSBR","validation.txt")
 
 #set up input parameters
 input=InputParameters()
@@ -23,6 +21,8 @@ input.method       = "BayesC"
 input.varGenotypic = 4.48
 input.varResidual  = 6.72
 input.probFixed    = 0.99
+input.outFreq      = 10000
+
 
 MCMCinfo(input)
 #MCMC Information:
@@ -50,6 +50,7 @@ using DataFrames
 df = readtable(Validation, eltypes =[UTF8String, Float64], separator = ' ',header=false,names=[:ID,:EBV]);
 comp=join(out,df,on=:ID);
 cor(comp[:EBV],comp[:EBV_1])
+
 ```
 
 ####More
